@@ -1,0 +1,104 @@
+/* ============================================================================
+   PWND.CHROME  —  userContent.css
+   pagina em branco, about:*, scrollbars e selecao de texto em todo site
+   ========================================================================= */
+
+/* ---- selecao de texto: fuchsia sobre preto ---------------------------- */
+::selection {
+  background-color: #d946ef !important;
+  color: #050505 !important;
+  text-shadow: none !important;
+}
+::-moz-selection {
+  background-color: #d946ef !important;
+  color: #050505 !important;
+}
+
+/* ---- scrollbars em todo site ------------------------------------------ */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: #241a33 #050505;
+}
+* {
+  scrollbar-color: #241a33 #050505;
+}
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: #050505; }
+*::-webkit-scrollbar-thumb {
+  background: #241a33;
+  border-radius: 0;
+  border: none;
+}
+*::-webkit-scrollbar-thumb:hover { background: #9333ea; }
+*::-webkit-scrollbar-thumb:active { background: #d946ef; }
+*::-webkit-scrollbar-corner { background: #050505; }
+
+/* ---- about:blank / about:home escuros (mata o flash branco) ---------- */
+@-moz-document url("about:blank") {
+  html, body {
+    background-color: #050505 !important;
+    color: #ece9f5 !important;
+  }
+}
+
+@-moz-document url("about:home"), url("about:newtab") {
+  body, .outer-wrapper, .activity-stream {
+    background-color: #050505 !important;
+    color: #ece9f5 !important;
+    font-family: "JetBrains Mono", monospace !important;
+  }
+  /* caixa de busca quadrada e com glow */
+  .search-wrapper .search-handoff-button,
+  .search-wrapper input {
+    background: #0a0710 !important;
+    border: 1px solid #241a33 !important;
+    border-radius: 0 !important;
+    color: #ece9f5 !important;
+    box-shadow: none !important;
+    font-family: "JetBrains Mono", monospace !important;
+  }
+  .search-wrapper .search-handoff-button:focus-within,
+  .search-wrapper input:focus {
+    border-color: #d946ef !important;
+    box-shadow: 0 0 12px rgba(217, 70, 239, .35) !important;
+  }
+  .search-wrapper .logo-and-wordmark { opacity: .85 !important; filter: grayscale(1) sepia(1) hue-rotate(250deg) saturate(6); }
+  .top-site-outer .tile {
+    background: #0a0710 !important;
+    border: 1px solid #241a33 !important;
+    border-radius: 0 !important;
+  }
+  .top-site-outer .tile:hover { border-color: #d946ef !important; }
+  .top-site-outer .title, .top-site-outer .title span { color: #ece9f5 !important; }
+  .section-title span { color: #d946ef !important; letter-spacing: 1px !important; }
+  /* limpa os patrocinados */
+  .ds-card, [class*="sponsored"], #sponsored-content { display: none !important; }
+}
+
+/* ---- paginas internas do Firefox (about:preferences, addons) ---------- */
+@-moz-document url-prefix("about:preferences"),
+               url-prefix("about:addons"),
+               url-prefix("about:config"),
+               url-prefix("about:profiles"),
+               url-prefix("about:support") {
+  :root {
+    --in-content-page-background: #050505 !important;
+    --in-content-page-color: #ece9f5 !important;
+    --in-content-box-background: #0a0710 !important;
+    --in-content-box-border-color: #241a33 !important;
+    --in-content-button-background: #0a0710 !important;
+    --in-content-primary-button-background: #9333ea !important;
+    --in-content-primary-button-text-color: #fff !important;
+  }
+  html, body { background-color: #050505 !important; }
+  /* dual-tone: links/info em ciano, acao em fuchsia */
+  a, .text-link, .learnMore { color: #22d3ee !important; }
+  input, textarea, select { caret-color: #22d3ee !important; }
+}
+
+/* ---- PDF viewer ------------------------------------------------------- */
+@-moz-document url-prefix("resource://pdf.js") {
+  #viewerContainer, #outerContainer, .toolbar { background-color: #050505 !important; }
+  .toolbar { border-bottom: 1px solid #241a33 !important; }
+  #viewerContainer { --sidebar-bg-color: #0a0710 !important; }
+}

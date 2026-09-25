@@ -1,0 +1,72 @@
+// ==UserScript==
+// @name           PWND buffer numbers
+// @description    Numera as abas ativas como buffers de terminal (Alt+1..9)
+// @include        main
+// ==/UserScript==
+
+(function () {
+  "use strict";
+  console.log("[pwnd] buffer_numbers carregado");
+
+  const MAX = 9;
+  const doc = document;
+  const gBrowser = window.gBrowser;
+  if (!gBrowser || !gBrowser.tabContainer) {
+    return;
+  }
+  const tabContainer = gBrowser.tabContainer;
+
+  function update() {
+    const tabs = gBrowser.tabs;
+    for (let i = 0; i < tabs.length; i++) {
+      const tab = tabs[i];
+      const n = i < MAX && !tab.pinned ? String(i + 1) : "";
+      let badge = tab.querySelector(".p-buffer-num");
+      if (!n) {
+        if (badge) {
+          badge.remove();
+        }
+        tab.removeAttribute("data-pnum");
+        continue;
+      }
+      if (!badge) {
+        badge = doc.createElementNS(
+          "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+          "label"
+        );
+        badge.className = "p-buffer-num";
+        const content = tab.querySelector(".tab-content") || tab;
+        content.insertBefore(badge, content.firstChild);
+      }
+      if (badge.getAttribute("value") !== n) {
+        badge.setAttribute("value", n);
+      }
+      tab.setAttribute("data-pnum", n);
+    }
+  }
+
+  let pending = false;
+  function schedule() {
+    if (pending) {
+      return;
+    }
+    pending = true;
+    window.requestAnimationFrame(() => {
+      pending = false;
+      update();
+    });
+  }
+
+  for (const ev of [
+    "TabOpen",
+    "TabClose",
+    "TabMove",
+    "TabSelect",
+    "TabPinned",
+    "TabUnpinned",
+  ]) {
+    tabContainer.addEventListener(ev, schedule, false);
+  }
+
+  schedule();
+})();

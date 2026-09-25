@@ -1,0 +1,971 @@
+/* ============================================================================
+   PWND.CHROME  —  userChrome.css            Firefox 153 (validado em Xvfb)
+   #050505 bg | #0a0710 bg2 | #120b1c bg3 | #d946ef accent | #9333ea accent2
+   JetBrains Mono | cantos 0px | bordas 1px | glow neon
+
+   NOTA IMPORTANTE (FF 153): a urlbar virou <html:moz-urlbar> com Shadow DOM.
+   Nada dentro dela (#urlbar-background, .urlbar-input ...) aceita seletor
+   direto — so da pra estilizar por CSS custom properties herdadas no :host.
+   Por isso o bloco da urlbar e 100% baseado em variaveis.
+   ========================================================================= */
+
+:root {
+  /* ---- tokens -------------------------------------------------------- */
+  --p-bg:        #050505;
+  --p-bg2:       #0a0710;
+  --p-bg3:       #120b1c;
+  --p-fg:        #ece9f5;
+  --p-dim:       #8b849b;
+  --p-dimmer:    #56505f;
+  --p-line:      #241a33;
+  /* dual-tone: fuchsia = interacao (hover/selecao/foco);
+     ciano = estado/informacao (links, downloads, progresso, matches). */
+  --p-accent:      #d946ef;
+  --p-accent2:     #9333ea;
+  --p-accent-info: #22d3ee;
+  --p-accent-load: #f59e0b;
+  --p-alert:     #ff3b4e;
+  /* glow reservado: aba ativa, foco da urlbar, matches e selecao. */
+  --p-glow:      0 0 6px rgba(217, 70, 239, .55);
+  --p-glow-info: 0 0 6px rgba(34, 211, 238, .45);
+  --p-glow-soft: 0 0 10px rgba(217, 70, 239, .28);
+  --p-mono:      "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", monospace;
+  --p-ui:        "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* ---- mata o visual arredondado do Proton --------------------------- */
+  --toolbarbutton-border-radius: 0 !important;
+  --tab-border-radius:           0 !important;
+  --arrowpanel-border-radius:    0 !important;
+  --panel-border-radius:         0 !important;
+  --button-border-radius:        0 !important;
+  --general-border-radius:       0 !important;
+  --border-radius-small:         0 !important;
+  --border-radius-medium:        0 !important;
+  --border-radius-large:         0 !important;
+  --border-radius-xlarge:        0 !important;
+  --border-radius-xxlarge:       0 !important;
+  --border-radius-circle:        0 !important;
+
+  /* ---- Firefox vars -------------------------------------------------- */
+  --lwt-accent-color:                var(--p-bg)  !important;
+  --lwt-text-color:                  var(--p-fg)  !important;
+  --toolbar-bgcolor:                 var(--p-bg)  !important;
+  --toolbar-color:                   var(--p-fg)  !important;
+  --toolbar-field-background-color:  var(--p-bg2) !important;
+  --toolbar-field-background-color-focus: var(--p-bg3) !important;
+  --toolbar-field-color:             var(--p-fg)  !important;
+  --toolbar-field-text-color:        var(--p-fg)  !important;
+  --toolbar-field-text-color-focus:  #ffffff    !important;
+  --toolbar-field-border-color:      var(--p-line) !important;
+  --toolbar-field-border-color-focus: var(--p-accent) !important;
+  --toolbar-field-highlight:         var(--p-accent) !important;
+  --toolbar-field-highlight-text:    #050505    !important;
+  --tab-min-height:                  30px  !important;
+  --tab-block-margin:                3px   !important;
+  --tab-max-width:                   235px !important;
+  --tab-background-color-hover:      rgba(217, 70, 239, .07) !important;
+  --tab-background-color-selected:   var(--p-bg3) !important;
+  --tab-box-shadow:                  none  !important;
+  --tab-close-button-padding:        5px   !important;
+  --tab-selected-bgcolor:            var(--p-bg3) !important;
+  --tab-selected-textcolor:          #ffffff    !important;
+  --tab-selected-outline-color:      transparent !important;
+  --tab-hover-background-color:      rgba(217, 70, 239, .07) !important;
+  --arrowpanel-background:           var(--p-bg2) !important;
+  --arrowpanel-color:                var(--p-fg)  !important;
+  --arrowpanel-border-color:         var(--p-line)!important;
+  --arrowpanel-dimmed:               rgba(217, 70, 239, .12) !important;
+  --arrowpanel-dimmed-further:       rgba(217, 70, 239, .20) !important;
+  --panel-background:                var(--p-bg2) !important;
+  --panel-color:                     var(--p-fg)  !important;
+  --panel-border-color:              var(--p-line)!important;
+  --focus-outline-color:             var(--p-accent) !important;
+  --focus-outline-width:             1px !important;
+  --focus-outline:                   1px solid var(--p-accent) !important;
+  --in-content-page-background:      var(--p-bg)  !important;
+  --in-content-page-color:           var(--p-fg)  !important;
+  --in-content-primary-button-background: var(--p-accent2) !important;
+  --newtab-background-color:         var(--p-bg)  !important;
+  --newtab-text-primary-color:       var(--p-fg)  !important;
+  --sidebar-background-color:        var(--p-bg2) !important;
+  --sidebar-text-color:              var(--p-fg)  !important;
+  --autocomplete-popup-background:   var(--p-bg2) !important;
+  --autocomplete-popup-color:        var(--p-fg)  !important;
+  --autocomplete-popup-highlight-background: var(--p-accent2) !important;
+  --autocomplete-popup-highlight-color: #ffffff !important;
+  --tabs-navbar-separator-color:     var(--p-line)!important;
+  --chrome-content-separator-color:  var(--p-accent2) !important;
+  --background-color-dimmed:         rgba(217, 70, 239, .14) !important;
+
+  /* ---- urlbar: geometria (Shadow DOM -> so via variaveis) ------------ */
+  --urlbar-min-height:              30px  !important;
+  --urlbar-container-height:        36px  !important;
+  --urlbar-height:                  30px  !important;
+  --urlbar-margin-inline:           6px   !important;
+  --urlbar-padding-block:           3px   !important;
+  --urlbar-border-radius:           0     !important;
+  --urlbarview-border-radius:       0     !important;
+  --urlbar-inner-border-radius:     0     !important;
+  --urlbar-selection-border-radius: 0     !important;
+  --urlbar-input-gap:               .45em !important;
+  --urlbar-icon-fill-opacity:       1     !important;
+
+  /* ---- urlbar: superficie (fundos/bordas/glow) ----------------------- */
+  --urlbar-background-background-color:         var(--p-bg2) !important;
+  --urlbar-background-background-color-focused: var(--p-bg3) !important;
+  --urlbar-background-border:            1px solid var(--p-line)   !important;
+  --urlbar-background-border-breakout:   1px solid var(--p-accent) !important;
+  --urlbar-background-border-radius:     0 !important;
+  --urlbar-background-border-top-radius-breakout-compact: 0 !important;
+  --urlbar-background-inset-breakout:    0 !important;
+  --urlbar-background-inset-breakout-compact: 0 !important;
+  --urlbar-background-box-shadow-breakout: 0 8px 26px rgba(0,0,0,.85),
+                                           0 0 16px rgba(217,70,239,.25) !important;
+  --urlbar-background-box-shadow-breakout-compact: 0 0 16px rgba(217,70,239,.25) !important;
+  --urlbar-background-outline-focused:   1px solid var(--p-accent) !important;
+  --urlbar-input-container-border:       1px solid var(--p-line)   !important;
+
+  /* ---- urlbar: dropdown de resultados (tokens do .urlbarView) -------- */
+  --urlbarview-background-color-hover:    rgba(217, 70, 239, .14) !important;
+  --urlbarview-background-color-selected: rgba(147, 51, 234, .30) !important;
+  --urlbarview-separator-color:           var(--p-line) !important;
+  --urlbarview-text-color-action:         var(--p-dim)  !important;
+  --urlbarview-text-color-selected:       #ffffff !important;
+
+  color-scheme: dark !important;
+  font-family: var(--p-mono) !important;
+}
+
+/* =======================================================================
+   FUNDO GLOBAL + LINHA SCANLINE
+   ===================================================================== */
+#main-window,
+#browser,
+#appcontent,
+.browserContainer,
+#tabbrowser-tabbox {
+  background-color: var(--p-bg) !important;
+}
+
+/* 1px de separacao entre chrome e conteudo = linha de assinatura do tema.
+   Notas de campo (FF 153): background-image + background-size/position NAO
+   renderiza em elemento XUL; ::before/::after tambem nao; border-image e
+   ignorado. O que funciona e border-bottom solido + box-shadow (glow). */
+#navigator-toolbox {
+  background-color: var(--p-bg) !important;
+  border-bottom: 1px solid var(--p-accent2) !important;
+  box-shadow: 0 1px 14px rgba(217, 70, 239, .22) !important;
+  transition: margin-top .18s ease, opacity .18s ease;
+}
+
+/* (sem escurecer a toolbox em janela inativa: mantem as cores exatas) */
+
+/* =======================================================================
+   CHROME REATIVO AO ESTADO DA PAGINA
+   Prioridade por ordem: seguro -> inseguro -> carregando -> digitando.
+   Depende de :has() (FF121+) e dos atributos reais do browser.xhtml:
+   #identity-box(.verifiedDomain/.notSecure/.certErrorPage),
+   #reload-button[displaystop] (carregando), #urlbar[usertyping].
+   ===================================================================== */
+#navigator-toolbox:has(#identity-box.verifiedDomain) {
+  border-bottom-color: var(--p-accent-info) !important;
+  box-shadow: 0 1px 14px rgba(34, 211, 238, .22) !important;
+}
+#navigator-toolbox:has(#identity-box:is(.notSecure, .notSecureText, .certErrorPage, .mixedActiveContent)) {
+  border-bottom-color: var(--p-alert) !important;
+  box-shadow: 0 1px 14px rgba(255, 59, 78, .30) !important;
+}
+#navigator-toolbox:has(#reload-button[displaystop]) {
+  border-bottom-color: var(--p-accent-load) !important;
+  box-shadow: 0 1px 14px rgba(245, 158, 11, .30) !important;
+}
+#navigator-toolbox:has(#urlbar[usertyping]) {
+  border-bottom-color: var(--p-accent) !important;
+  box-shadow: 0 1px 14px rgba(217, 70, 239, .30) !important;
+}
+
+/* aba carregando: inset ambar na ativa (o progresso fica na barra do rodape) */
+.tabbrowser-tab[selected][busy="true"] > .tab-stack > .tab-background {
+  box-shadow: inset 0 2px 0 0 var(--p-accent-load),
+              inset 0 0 0 1px #b45309 !important;
+}
+
+/* =======================================================================
+   BARRA DE ABAS
+   REGRA DE OURO: geometria de aba SO por variavel de plataforma, na raiz.
+   O Firefox calcula --tabstrip-min-height = --tab-min-height + 2*--tab-block-margin
+   e anima min-width/max-width das abas conforme a lotacao da barra. Setar
+   --tab-min-height dentro do .tabbrowser-tab, ou forcar max-width/padding-inline
+   na aba, quebra essa matematica: a barra deixa de voltar pra esquerda ao
+   fechar aba e a aba desalinha na vertical durante o arrasto.
+   ===================================================================== */
+#TabsToolbar {
+  background: transparent !important;
+}
+#TabsToolbar .toolbarbutton-1 > .toolbarbutton-icon { background: transparent !important; }
+
+.tabbrowser-tab {
+  color: var(--p-dim) !important;
+  font-family: var(--p-mono) !important;
+  font-size: 11.5px !important;
+  letter-spacing: .15px !important;
+}
+/* so pintura: nenhuma propriedade de layout aqui */
+.tab-background {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.tabbrowser-tab:hover > .tab-stack > .tab-background {
+  background: rgba(217, 70, 239, .06) !important;
+}
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: var(--p-bg3) !important;
+  /* IMPORTANTE: so sombras *inset*. Uma sombra externa (glow) vaza pra fora
+     do retangulo da aba e a aba ativa parece maior que as vizinhas. */
+  box-shadow: inset 0 2px 0 0 var(--p-accent),
+              inset 0 0 0 1px var(--p-accent2) !important;
+}
+.tabbrowser-tab[selected] { color: #ffffff !important; }
+.tabbrowser-tab[selected] .tab-label { text-shadow: var(--p-glow) !important; }
+
+/* favicon: cinza/apagado nas inativas, acende na ativa/hover
+   (dark-room: a cor so aparece na aba ativa) */
+.tab-icon-image {
+  filter: grayscale(1) opacity(.28) !important;
+  border-radius: 0 !important;
+}
+.tabbrowser-tab:hover .tab-icon-image { filter: grayscale(.35) opacity(.8) !important; }
+.tabbrowser-tab[selected] .tab-icon-image,
+.tabbrowser-tab[pinned] .tab-icon-image { filter: none !important; }
+.tabbrowser-tab:not([selected]) .tab-label { color: var(--p-dimmer) !important; }
+.tab-icon-pending { border-radius: 0 !important; }
+
+/* throbber: desativado pelo hack tab_loading_progress_bar (barra no rodape) */
+
+/* botao fechar: aparece so no hover, vermelho ao passar por cima */
+.tab-close-button {
+  border-radius: 0 !important;
+  opacity: 0 !important;
+  transition: opacity .12s linear !important;
+}
+.tabbrowser-tab:hover .tab-close-button,
+.tabbrowser-tab[selected] .tab-close-button { opacity: .55 !important; }
+.tab-close-button:hover {
+  opacity: 1 !important;
+  background-color: var(--p-alert) !important;
+}
+.tab-close-button:hover image { fill: #050505 !important; }
+.tab-icon-overlay, .tab-audio-button { border-radius: 0 !important; }
+
+#tabs-newtab-button,
+#new-tab-button,
+#alltabs-button {
+  border-radius: 0 !important;
+  color: var(--p-dim) !important;
+}
+#tabs-newtab-button:hover,
+#new-tab-button:hover,
+#alltabs-button:hover {
+  background: rgba(217, 70, 239, .1) !important;
+  color: var(--p-accent) !important;
+  box-shadow: var(--p-glow-soft) !important;
+}
+#tabs-newtab-button .toolbarbutton-icon,
+#new-tab-button .toolbarbutton-icon { fill: currentColor !important; }
+
+/* =======================================================================
+   NAV BAR
+   ===================================================================== */
+#nav-bar {
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+.toolbarbutton-1,
+.toolbarbutton-1 > .toolbarbutton-icon { border-radius: 0 !important; }
+.toolbarbutton-1 {
+  color: var(--p-dim) !important;
+  transition: color .12s linear, background-color .12s linear !important;
+}
+.toolbarbutton-1 > .toolbarbutton-icon { fill: currentColor !important; }
+.toolbarbutton-1:hover:not([disabled]) {
+  background-color: rgba(217, 70, 239, .12) !important;
+  color: var(--p-accent) !important;
+}
+/* sem drop-shadow no hover: glow fica so p/ aba ativa/foco/matches */
+.toolbarbutton-1[open],
+.toolbarbutton-1[checked] {
+  background-color: rgba(147, 51, 234, .22) !important;
+  color: #ffffff !important;
+}
+/* badges de contagem. ATENCAO: o Firefox usa a MESMA classe para os
+   "feature-callout" (pontinho pulsante das promos CFR, 14x14) — sem o
+   :not(.feature-callout) esses pontinhos viram quadrados solidos de accent
+   na barra e parecem icone quebrado. */
+.toolbarbutton-badge:not(.feature-callout) {
+  background: var(--p-accent) !important;
+  color: #050505 !important;
+  border-radius: 0 !important;
+  font-family: var(--p-mono) !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+/* =======================================================================
+   URLBAR  (todo o miolo e Shadow DOM: so variaveis alcancam)
+   ===================================================================== */
+#urlbar,
+#searchbar {
+  font-family: var(--p-mono) !important;
+  caret-color: var(--p-accent) !important;
+}
+
+/* NOTA (FF 153): nao existe elemento alcancavel para marcar o inicio do
+   campo. O que aparece ali (#trust-icon / escudo) e #trust-icon-container,
+   interno ao Shadow DOM da urlbar; o #identity-box do browser.xhtml fica
+   oculto quando o trust panel esta ativo. Sem ::part e sem ::before em XUL,
+   a "assinatura" do campo fica por conta das variaveis (fundo, borda, caret,
+   selecao, glow no foco) definidas no bloco :root acima. */
+
+/* icones da urlbar (luz/estrela/escudo) em fuchsia no hover */
+#identity-box,
+#tracking-protection-icon-container,
+#identity-icon-box,
+#star-button-box,
+.urlbar-page-action { border-radius: 0 !important; }
+#identity-box:hover,
+#identity-icon-box:hover,
+#tracking-protection-icon-container:hover,
+.urlbar-page-action:hover {
+  background-color: rgba(217, 70, 239, .14) !important;
+}
+#identity-box:hover > #identity-icon,
+#tracking-protection-icon-container:hover > #tracking-protection-icon {
+  fill: var(--p-accent) !important;
+}
+
+/* =======================================================================
+   BOOKMARKS TOOLBAR
+   ===================================================================== */
+#PersonalToolbar {
+  background: transparent !important;
+}
+#PersonalToolbar .bookmark-item,
+#PersonalToolbar .toolbarbutton-1 {
+  color: var(--p-dim) !important;
+  font-family: var(--p-ui) !important;
+  font-size: 11px !important;
+  letter-spacing: .2px !important;
+  border-radius: 0 !important;
+}
+#PersonalToolbar .bookmark-item:hover {
+  background: rgba(217, 70, 239, .12) !important;
+  color: var(--p-accent) !important;
+}
+#personal-toolbar-empty-description { color: var(--p-dimmer) !important; }
+
+/* =======================================================================
+   PAINEIS / MENUS
+   ===================================================================== */
+panel,
+panelmultiview,
+.panel-arrowcontent {
+  background: var(--p-bg2) !important;
+  color: var(--p-fg) !important;
+  font-family: var(--p-ui) !important;
+  font-size: 12px !important;
+}
+.panel-arrow { display: none !important; }
+
+panelview,
+.panel-subview-body,
+.panel-header {
+  background: var(--p-bg2) !important;
+  color: var(--p-fg) !important;
+}
+.panel-header {
+  font-family: var(--p-mono) !important;
+  border-bottom: 1px solid var(--p-line) !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  color: var(--p-accent) !important;
+}
+toolbarbutton.subviewbutton,
+.subviewbutton { border-radius: 0 !important; font-family: var(--p-ui) !important; }
+toolbarbutton.subviewbutton:hover,
+.subviewbutton:hover:not([disabled]),
+.subviewbutton[_moz-menuactive="true"] {
+  background-color: rgba(217, 70, 239, .14) !important;
+  color: #ffffff !important;
+}
+.subviewbutton:hover > .toolbarbutton-icon,
+.subviewbutton:hover > image { fill: var(--p-accent) !important; }
+
+menupopup {
+  background: var(--p-bg2) !important;
+  color: var(--p-fg) !important;
+  font-family: var(--p-ui) !important;
+  font-size: 12px !important;
+}
+menu, menuitem, menucaption {
+  font-family: var(--p-ui) !important;
+  color: var(--p-fg) !important;
+  border-radius: 0 !important;
+}
+menuitem[_moz-menuactive="true"],
+menu[_moz-menuactive="true"],
+menuitem:hover, menu:hover {
+  background-color: rgba(217, 70, 239, .18) !important;
+  color: #ffffff !important;
+}
+menuitem[disabled="true"] { color: var(--p-dimmer) !important; }
+menuseparator { border-top: 1px solid var(--p-line) !important; }
+
+/* =======================================================================
+   SIDEBAR
+   ===================================================================== */
+#sidebar-box {
+  background: var(--p-bg2) !important;
+  border-inline-end: 1px solid var(--p-line) !important;
+}
+#sidebar-header {
+  background: var(--p-bg2) !important;
+  color: var(--p-accent) !important;
+  border-bottom: 1px solid var(--p-line) !important;
+  font-family: var(--p-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+}
+#sidebar-splitter {
+  background: var(--p-line) !important;
+  border: none !important;
+  width: 1px !important;
+}
+#sidebar-splitter:hover { background: var(--p-accent) !important; }
+
+/* =======================================================================
+   FINDBAR / STATUS / TITLEBAR
+   ===================================================================== */
+findbar {
+  background: var(--p-bg2) !important;
+  border-top: 1px solid var(--p-accent2) !important;
+  color: var(--p-fg) !important;
+  font-family: var(--p-mono) !important;
+  padding: 4px 8px !important;
+}
+findbar .findbar-textbox {
+  background: var(--p-bg) !important;
+  color: var(--p-fg) !important;
+  border: 1px solid var(--p-line) !important;
+  border-radius: 0 !important;
+  font-family: var(--p-mono) !important;
+  caret-color: var(--p-accent) !important;
+}
+findbar .findbar-textbox:focus {
+  border-color: var(--p-accent) !important;
+  box-shadow: 0 0 8px rgba(217, 70, 239, .3) !important;
+  outline: none !important;
+}
+findbar .findbar-textbox[status="notfound"] {
+  border-color: var(--p-alert) !important;
+  color: var(--p-alert) !important;
+}
+findbar toolbarbutton { border-radius: 0 !important; color: var(--p-dim) !important; }
+findbar toolbarbutton:hover {
+  background: rgba(217, 70, 239, .14) !important;
+  color: var(--p-accent) !important;
+}
+.findbar-label, .findbar-find-status { color: var(--p-dim) !important; font-size: 11px !important; }
+.found-matches { color: var(--p-accent-info) !important; text-shadow: var(--p-glow-info) !important; }
+
+/* preview do link = linha de status de terminal */
+#statuspanel { max-width: 62% !important; bottom: 3px !important; inset-inline-start: 6px !important; }
+#statuspanel-label {
+  background: var(--p-bg2) !important;
+  color: var(--p-accent-info) !important;
+  border: 1px solid var(--p-line) !important;
+  border-left: 3px solid var(--p-accent-info) !important;
+  border-radius: 0 !important;
+  font-family: var(--p-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: .2px !important;
+  padding: 3px 8px !important;
+  box-shadow: 0 0 12px rgba(0, 0, 0, .7) !important;
+}
+
+.titlebar-buttonbox-container { background: transparent !important; }
+.titlebar-button { border-radius: 0 !important; color: var(--p-dim) !important; padding-inline: 10px !important; }
+.titlebar-button:hover { background: rgba(217, 70, 239, .16) !important; color: #ffffff !important; }
+#titlebar-close:hover { background: var(--p-alert) !important; }
+#titlebar-close:hover > image { fill: #050505 !important; }
+
+.popup-notification-body, #notification-popup-box { font-family: var(--p-ui) !important; }
+
+/* fullscreen: toolbox some, volta no hover */
+#main-window[inFullscreen] #navigator-toolbox { opacity: 0; }
+#main-window[inFullscreen]:hover #navigator-toolbox { opacity: 1; }
+
+/* =======================================================================
+   SCROLLBARS DO CHROME / DOWNLOADS
+   ===================================================================== */
+scrollbar { background: var(--p-bg) !important; }
+scrollbar[orient="vertical"] { width: 9px !important; }
+scrollbar[orient="horizontal"] { height: 9px !important; }
+scrollbar thumb { background: var(--p-line) !important; border-radius: 0 !important; border: none !important; }
+scrollbar thumb:hover { background: var(--p-accent2) !important; }
+scrollbar thumb:active { background: var(--p-accent) !important; }
+scrollbar scrollbarbutton { display: none !important; }
+
+#context-navigation { background: var(--p-bg3) !important; }
+#context-navigation > .menuitem-iconic:hover { background: rgba(217, 70, 239, .2) !important; }
+
+#downloads-indicator-progress-inner {
+  background: var(--p-accent-info) !important;
+  border-radius: 0 !important;
+}
+#downloads-indicator-progress-outer { border-radius: 0 !important; }
+#downloadsPanel .downloadTarget { color: var(--p-fg) !important; }
+#downloadsPanel .downloadDetails { color: var(--p-dim) !important; }
+
+/* =======================================================================
+   AJUSTES FINOS
+   ===================================================================== */
+#firefox-view-button { display: none !important; }
+#nav-bar toolbarseparator, #nav-bar .toolbarseparator { display: none !important; }
+
+/* =======================================================================
+   POLIMENTO
+   ===================================================================== */
+/* janela inativa: so os rotulos de aba esmaecem (sem mexer nas cores base) */
+#main-window:-moz-window-inactive .tabbrowser-tab:not([selected]) {
+  color: var(--p-dimmer) !important;
+}
+
+/* acessibilidade: mata transicoes/animacoes quando o SO pede */
+@media (prefers-reduced-motion: reduce) {
+  .tab-close-button,
+  .tabbrowser-tab,
+  .toolbarbutton-1,
+  #p-crt-overlay,
+  #p-crt-overlay::after,
+  #p-ruler-band {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* =======================================================================
+   IDEA 4 - BUFFER NUMBERS (fallback JS)
+   O numbered_tabs (CSS counter) e o metodo ativo. Este bloco so e usado se
+   o JS for reativado: mv JS/buffer_numbers.uc.js.disabled JS/buffer_numbers.uc.js
+   ===================================================================== */
+.p-buffer-num {
+  margin-inline-end: 5px;
+  padding-inline-end: 5px;
+  border-inline-end: 1px solid var(--p-line);
+  color: var(--p-dimmer);
+  font-family: var(--p-mono) !important;
+  font-size: 9px !important;
+  line-height: 1.1;
+  align-self: center;
+  pointer-events: none;
+}
+.tabbrowser-tab:hover .p-buffer-num { color: var(--p-dim); }
+.tabbrowser-tab[selected] .p-buffer-num {
+  color: var(--p-accent);
+  border-inline-end-color: var(--p-accent);
+}
+.tabbrowser-tab[pinned] .p-buffer-num { display: none !important; }
+
+/* =======================================================================
+   IDEA 8 - CRT SCREENSAVER (overlay injetado por JS)
+   ===================================================================== */
+#p-crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s ease;
+  background:
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, .72) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, rgba(0, 0, 0, 0) 1px 3px);
+}
+#p-crt-overlay::after {
+  content: "[ IDLE ]";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--p-mono);
+  font-size: 22px;
+  letter-spacing: 8px;
+  color: var(--p-accent);
+  text-shadow: 0 0 14px var(--p-accent);
+  opacity: 0;
+  transition: opacity .6s ease .2s;
+}
+#main-window[p-idle="true"] #p-crt-overlay { opacity: 1; }
+#main-window[p-idle="true"] #p-crt-overlay::after { opacity: .8; }
+#main-window[p-idle="true"] #navigator-toolbox { filter: saturate(.35) brightness(.65); }
+#main-window[p-idle="true"] #tabbrowser-tabbox { filter: saturate(.4) brightness(.7); }
+/* wake flash: 260ms de overlay visivel quando o usuario volta */
+#main-window[p-wake="true"] #p-crt-overlay { opacity: .35; transition: none; }
+
+/* =======================================================================
+   IDEA 10 - KILLED CLOSE (atributo p-killed aplicado por JS)
+   ===================================================================== */
+.tabbrowser-tab[p-killed="true"] {
+  pointer-events: none !important;
+  animation: p-kill .18s steps(4, end) forwards !important;
+}
+.tabbrowser-tab[p-killed="true"] > .tab-stack > .tab-background {
+  background: rgba(255, 59, 78, .5) !important;
+  box-shadow: inset 0 0 0 1px var(--p-alert) !important;
+}
+@keyframes p-kill {
+  0%   { opacity: 1; }
+  55%  { opacity: 1; filter: brightness(2) saturate(1.4) hue-rotate(-16deg); }
+  100% { opacity: .35; filter: brightness(.5); }
+}
+
+/* =======================================================================
+   READING RULER (segure Shift+Alt; camadas injetadas por JS)
+   capture = recebe o mouse em cima do conteudo; band = spotlight
+   ===================================================================== */
+#p-probe-capture {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+#p-ruler-band {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  height: 60px;
+  margin-top: -30px;
+  z-index: 2147483001;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .1s linear;
+  /* o box-shadow com spread gigante escurece tudo FORA da faixa */
+  box-shadow: 0 0 0 100vmax rgba(5, 5, 5, .55);
+  background: rgba(217, 70, 239, .05);
+  border-top: 1px solid var(--p-line);
+  border-bottom: 1px solid var(--p-line);
+}
+#p-ruler-band[data-on="true"] { opacity: 1; }
+#p-ruler-band[data-away="true"] { opacity: 0; }
+#p-ruler-band .p-ruler-line {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--p-accent);
+  box-shadow: 0 0 8px var(--p-accent);
+  opacity: .85;
+}
+
+/* medida (arrastar) */
+#p-measure-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483002;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid var(--p-accent-info);
+  background: rgba(34, 211, 238, .10);
+  box-shadow: 0 0 10px rgba(34, 211, 238, .35);
+}
+#p-measure-box[data-on="true"] { opacity: 1; }
+#p-measure-label {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483003;
+  pointer-events: none;
+  display: none;
+  padding: 2px 6px;
+  background: var(--p-bg2);
+  color: var(--p-accent-info);
+  border: 1px solid var(--p-accent-info);
+  font-family: var(--p-mono);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* spotlight de elemento */
+#p-probe-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483002;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid var(--p-accent);
+  background: rgba(217, 70, 239, .07);
+  box-shadow: 0 0 0 100vmax rgba(5, 5, 5, .45),
+              0 0 10px rgba(217, 70, 239, .40);
+}
+#p-probe-box[data-on="true"] { opacity: 1; }
+#p-probe-badge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483003;
+  pointer-events: none;
+  opacity: 0;
+  padding: 2px 6px;
+  background: var(--p-bg2);
+  color: var(--p-fg);
+  border: 1px solid var(--p-line);
+  font-family: var(--p-mono);
+  font-size: 10px;
+  white-space: nowrap;
+}
+#p-probe-badge[data-on="true"] { opacity: 1; }
+
+/* feedback de copia */
+#p-probe-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%);
+  z-index: 2147483004;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s linear;
+  padding: 4px 10px;
+  background: var(--p-bg2);
+  color: var(--p-accent-info);
+  border: 1px solid var(--p-accent-info);
+  font-family: var(--p-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+#p-probe-toast[data-on="true"] { opacity: 1; }
+
+/* =======================================================================
+   SCROLL CHROME - toolbar/abas somem ao descer, voltam ao subir
+   ===================================================================== */
+#main-window[p-scroll="down"] #navigator-toolbox {
+  margin-top: calc(-1 * var(--p-tb-h, 80px)) !important;
+  opacity: 0 !important;
+}
+#p-topzone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 2147482996;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* =======================================================================
+   SELECTION CHIP - chip ao selecionar texto
+   ===================================================================== */
+#p-sel-chip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483002;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: var(--p-bg2);
+  border: 1px solid var(--p-line);
+  border-left: 2px solid var(--p-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s linear;
+  font-family: var(--p-mono);
+  font-size: 10px;
+  color: var(--p-dim);
+  white-space: nowrap;
+}
+#p-sel-chip[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+#p-sel-chip .p-sel-info { color: var(--p-accent-info); }
+#p-sel-chip .p-sel-btn {
+  cursor: pointer;
+  padding: 2px 6px;
+  color: var(--p-dim);
+  border: 1px solid transparent;
+}
+#p-sel-chip .p-sel-btn:hover {
+  color: var(--p-accent);
+  border-color: var(--p-line);
+  background: rgba(217, 70, 239, .12);
+}
+
+/* =======================================================================
+   PAGE OUTLINE - indice flutuante
+   ===================================================================== */
+#p-outline {
+  position: fixed;
+  top: 78px;
+  right: 10px;
+  bottom: 44px;
+  width: 280px;
+  z-index: 2147483002;
+  background: var(--p-bg2);
+  border: 1px solid var(--p-line);
+  border-left: 2px solid var(--p-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s linear;
+  overflow: auto;
+  font-family: var(--p-ui);
+  font-size: 11px;
+}
+#p-outline[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+#p-outline .p-ol-head {
+  position: sticky;
+  top: 0;
+  background: var(--p-bg2);
+  border-bottom: 1px solid var(--p-line);
+  color: var(--p-accent);
+  font-family: var(--p-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+}
+#p-outline .p-ol-item {
+  padding: 3px 8px;
+  color: var(--p-dim);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+}
+#p-outline .p-ol-item:hover {
+  background: rgba(217, 70, 239, .12);
+  color: #ffffff;
+}
+#p-outline .p-ol-item[data-cur="true"] {
+  color: var(--p-accent);
+  border-left-color: var(--p-accent);
+  background: rgba(217, 70, 239, .07);
+}
+#p-outline .p-ol-l2 { padding-inline-start: 18px; }
+#p-outline .p-ol-l3 { padding-inline-start: 30px; }
+#p-outline .p-ol-l4 { padding-inline-start: 42px; }
+#p-outline .p-ol-l5 { padding-inline-start: 54px; }
+#p-outline .p-ol-l6 { padding-inline-start: 66px; }
+
+/* =======================================================================
+   HACKS DO MROTHERGUY (firefox-csshacks) - MPL 2.0
+   Fonte: https://github.com/MrOtherGuy/firefox-csshacks
+   Adaptados ao tema (tokens --p-*). Mantenha esta atribuicao.
+   ===================================================================== */
+
+/* --- numbered_tabs: numero da aba via CSS counter --------------------- */
+/* (substitui o buffer_numbers.uc.js, que ficou desativado) */
+#tabbrowser-tabs { counter-reset: nth-tab 0; }
+:not(tab-group[collapsed]) > .tabbrowser-tab { counter-increment: nth-tab; }
+.tab-text::before {
+  content: counter(nth-tab) " ";
+  color: var(--p-dimmer);
+  font-variant-numeric: tabular-nums;
+}
+.tabbrowser-tab:hover .tab-text::before { color: var(--p-dim); }
+.tabbrowser-tab[selected] .tab-text::before { color: var(--p-accent); }
+
+/* --- tab_loading_progress_bar: barra no rodape da aba (sem throbber) -- */
+@keyframes p-tab-load-anim { from { background-size: 0%; } to { background-size: 20%; } }
+.tab-background::after { background-size: 90%; }
+.tabbrowser-tab:is([busy], [bursting]) > .tab-stack > .tab-background::after {
+  content: "";
+  display: flex;
+  height: 2px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(var(--p-accent-load), var(--p-accent-load));
+  transition: background-size 80ms ease-out;
+}
+.tabbrowser-tab[busy]:not([progress], [bursting]) > .tab-stack > .tab-background::after {
+  animation: p-tab-load-anim 80ms ease;
+  background-size: 20%;
+  opacity: .5;
+}
+.tabbrowser-tab[busy][progress] > .tab-stack > .tab-background::after {
+  transition-duration: 2000ms;
+}
+.tabbrowser-tab[bursting] > .tab-stack > .tab-background::after {
+  transition: background-size 80ms ease-out, opacity 80ms linear;
+  background-size: 100%;
+  opacity: 0;
+}
+.tab-throbber { display: none !important; }
+.tab-icon-image[src] { display: block !important; }
+
+/* --- loading_indicator_bouncing_line: linha quicando durante o load --- */
+@keyframes p-statusline-anim { from { background-position-x: left; } to { background-position-x: right; } }
+#statuspanel[type="status"]::after {
+  position: fixed;
+  display: block;
+  height: 2px;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  content: "";
+  pointer-events: none;
+  background-size: 20%;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(to left, transparent, var(--p-accent-load), transparent);
+  animation: p-statusline-anim 400ms alternate infinite ease-in-out;
+}
+@media (min-width: 1000px) { #statuspanel[type="status"]::after { animation-duration: 460ms; } }
+@media (min-width: 1400px) { #statuspanel[type="status"]::after { animation-duration: 520ms; } }
+@media (min-width: 1700px) { #statuspanel[type="status"]::after { background-size: 15%; animation-duration: 550ms; } }
+@media (min-width: 2200px) { #statuspanel[type="status"]::after { animation-duration: 600ms; } }
+
+/* --- tab_closing_animation: aba permanece visivel ao fechar ---------- */
+.tabbrowser-tab:not([pinned], [fadein]) {
+  transition-duration: 240ms, 240ms !important;
+  transition-timing-function: ease-out, ease-out !important;
+  visibility: visible !important;
+}
+.tab-content:not([fadein], [pinned]) .tab-icon-pending:not([fadein]),
+.tab-content:not([fadein], [pinned]) .tab-icon-image:not([fadein]),
+.tab-label:not([fadein]) {
+  visibility: visible !important;
+}
+.tab-label:not([fadein]) { display: flex !important; }
+
+/* =======================================================================
+   EXTRAS (descomente o que quiser)
+   ===================================================================== */
+
+/* 1) Esconder a barra de abas quando existe apenas uma aba:
+.tabbrowser-tab:only-of-type { display: none !important; }
+hbox.titlebar-spacer { display: none !important; }
+#alltabs-button { display: none !important; }
+*/
+
+/* 2) Barra de abas automatica (aparece no hover do topo):
+#TabsToolbar { height: 0 !important; overflow: hidden !important; transition: height .15s ease !important; }
+#navigator-toolbox:hover #TabsToolbar { height: 34px !important; }
+*/
+
+/* 3) Nav-bar automatica:
+#nav-bar { height: 0 !important; overflow: hidden !important; transition: height .15s ease !important; }
+#navigator-toolbox:hover #nav-bar { height: 38px !important; }
+*/
+
+/* 4) Esconder a barra de favoritos:
+#PersonalToolbar { display: none !important; }
+*/
